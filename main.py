@@ -21,9 +21,15 @@ def game_board():
     print("--+---+--")
     print(f"{BOARD_POSITION[3]} | {BOARD_POSITION[4]} | {BOARD_POSITION[5]}")
     print("--+---+--")
-    print(f"{BOARD_POSITION[6]} | {BOARD_POSITION[7]} | {BOARD_POSITION[8]}")
+    print(f"{BOARD_POSITION[6]} | {BOARD_POSITION[7]} | {BOARD_POSITION[8]} \n")
 
 
+# restart gane
+def restart_game():
+    restart = input("Do you want to play again? (yes/no): ").lower()
+    return restart == 'yes'
+
+    
 # returns False if there is a win else True
 def check_win():
     game_board()
@@ -47,6 +53,7 @@ def check_win():
 def add_position(position, player):
     # check if the position is empty
     if BOARD_POSITION[position] == ' ':
+        print(f"Player {player} chooses position {position}")
         BOARD_POSITION[position] = player
         return True
 
@@ -62,7 +69,7 @@ def bot_move_position():
 
     # winnable and blockable positions
     for combination in WIN_CONDITION:
-        # reads
+        # Logic for winnable and blockable positions for the bot
         opportunities = [BOARD_POSITION[c_pos] for c_pos in combination]
         # winning opportunities
         if opportunities.count('O') == 2 and opportunities.count(' ') == 1:  # Bot can win
@@ -76,7 +83,6 @@ def bot_move_position():
         for pos in available_pos:
             # if the position is in the win condition
             if pos in pattern:
-                print(f"AI chooses position {pos}")
                 return pos
             else:
                 continue
@@ -129,8 +135,7 @@ def start_game():
     while game_on:
         # ensuring that the player types
         try:
-            # bot game mode
-            if current_game_mode == 0:
+            if current_game_mode == 0: # Human vs Bot
                 # Player
                 if current_player == 'X':
                     p1_position = player_input()
@@ -141,7 +146,6 @@ def start_game():
                 else:
                     bot_position = bot_move_position()
                     if bot_position is not None:
-                        print(f"AI chooses position {bot_position}")
                         add_position(bot_position, 'O')
                         game_on = check_win()
                         current_player = 'X'
@@ -162,11 +166,17 @@ def start_game():
                     if add_position(p2_position, 'O'):
                         game_on = check_win()
                         current_player = 'X'
+        # Handles difficulty options input errors
         except ValueError:
             print("Invalid input. Please enter a valid number.")
         except Exception as e:
             print(f"An error occurred: {e}")
 
+    # restart game
+    if restart_game():
+        BOARD_POSITION = [" " for _ in range(9)]
+        start_game()
 
-# calling the function
-start_game()
+# initializes the game
+if __name__ == "__main__":
+    start_game()
