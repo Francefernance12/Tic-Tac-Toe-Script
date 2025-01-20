@@ -1,47 +1,28 @@
-from random import choice, shuffle
+from random import choice
+from game_configs import BoardConfigs, instructions
 
-# Board positions
-BOARD_POSITION = [' ' for _ in range(9)]
-
-# Win conditions
-WIN_CONDITION = [
-    [0, 1, 2], [3, 4, 5], [6, 7, 8],  # rows
-    [0, 3, 6], [1, 4, 7], [2, 5, 8],  # columns
-    [0, 4, 8], [2, 4, 6]  # diagonals
-]
-
-# Changing the bot's pattern
-BOT_PATTERN = WIN_CONDITION[:]
-shuffle(BOT_PATTERN)
+board_configs = BoardConfigs()
 
 
-# Create the board
-def game_board():
-    print(f"{BOARD_POSITION[0]} | {BOARD_POSITION[1]} | {BOARD_POSITION[2]}")
-    print("--+---+--")
-    print(f"{BOARD_POSITION[3]} | {BOARD_POSITION[4]} | {BOARD_POSITION[5]}")
-    print("--+---+--")
-    print(f"{BOARD_POSITION[6]} | {BOARD_POSITION[7]} | {BOARD_POSITION[8]} \n")
-
-
-# restart gane
+# restart game
 def restart_game():
     restart = input("Do you want to play again? (yes/no): ").lower()
     return restart == 'yes'
 
-    
-# returns False if there is a win else True
+
+# Check if win condition met
 def check_win():
-    game_board()
-    for combination in WIN_CONDITION:
+    board_configs.game_board()
+    for combination in board_configs.WIN_CONDITION:
         # if any of the win conditions match, player wins
-        if BOARD_POSITION[combination[0]] == BOARD_POSITION[combination[1]] == BOARD_POSITION[combination[2]] != ' ':
+        if board_configs.BOARD_POSITION[combination[0]] == board_configs.BOARD_POSITION[combination[1]] == \
+                board_configs.BOARD_POSITION[combination[2]] != ' ':
             # prints the player's symbol
-            print(f"Player {BOARD_POSITION[combination[0]]} wins!")
+            print(f"Player {board_configs.BOARD_POSITION[combination[0]]} wins!")
             return False
 
     # if win condition is not met
-    if ' ' not in BOARD_POSITION:
+    if ' ' not in board_configs.BOARD_POSITION:
         print("It's a draw!")
         return False
 
@@ -52,9 +33,9 @@ def check_win():
 # Adds the player's position into the board. Player arg is either X or O
 def add_position(position, player):
     # check if the position is empty
-    if BOARD_POSITION[position] == ' ':
+    if board_configs.BOARD_POSITION[position] == ' ':
         print(f"Player {player} chooses position {position}")
-        BOARD_POSITION[position] = player
+        board_configs.BOARD_POSITION[position] = player
         return True
 
     print("Position occupied, please try again")
@@ -62,24 +43,25 @@ def add_position(position, player):
 
 
 # Bot logic
-def bot_move_position():
+def bot_move_position(difficulty):
     # positions available in the board
-    available_pos = [i for i, spot in enumerate(BOARD_POSITION) if spot == ' ']
+    available_pos = [i for i, spot in enumerate(board_configs.BOARD_POSITION) if spot == ' ']
     # print(available_positions)
 
     # winnable and blockable positions
-    for combination in WIN_CONDITION:
+    for combination in board_configs.WIN_CONDITION:
         # Logic for winnable and blockable positions for the bot
-        opportunities = [BOARD_POSITION[c_pos] for c_pos in combination]
+        opportunities = [board_configs.BOARD_POSITION[c_pos] for c_pos in combination]
         # winning opportunities
         if opportunities.count('O') == 2 and opportunities.count(' ') == 1:  # Bot can win
             return combination[opportunities.index(' ')]
-        # blocking opportunities
-        if opportunities.count('X') == 2 and opportunities.count(' ') == 1:  # Block opponent
-            return combination[opportunities.index(' ')]
+        if difficulty == 1:
+            # blocking opportunities
+            if opportunities.count('X') == 2 and opportunities.count(' ') == 1:  # Block opponent
+                return combination[opportunities.index(' ')]
 
     # Checks if available positions match one of the position in the win conditions
-    for pattern in BOT_PATTERN:
+    for pattern in board_configs.BOT_PATTERN:
         for pos in available_pos:
             # if the position is in the win condition
             if pos in pattern:
@@ -91,29 +73,6 @@ def bot_move_position():
     return choice(available_pos)
 
 
-# Instructions
-def instructions():
-    print("Starting game")
-    input("Press enter to play")
-    print("Player 1: X")
-    print("Player 2: O")
-    print("0 to 8 represents the position in the game board starting from top to bottom, left to right")
-    print("""
-     0 | 1 | 2 
-     --+---+--
-     3 | 4 | 5 
-     --+---+--
-     6 | 7 | 8
-    """)
-
-
-# Game Mode (Human vs Human or Human vs Bot)
-def game_mode():
-    game_mode = int(input("Type 0 to play with Bot, type 1 to play with human player: "))
-    return game_mode if game_mode in [0, 1] else None
-
-
-# player input
 def player_input():
     while True:
         try:
@@ -125,17 +84,29 @@ def player_input():
             print("Invalid input. Please enter a valid number.")
 
 
+# Game Mode (Human vs Human or Human vs Bot)
+def game_mode():
+    game_mode = int(input("Type 0 to play with Bot player, type 1 to play with human player: "))
+    if game_mode == 0:
+        difficulty = int(input("Type 0 for Easy difficulty, 1 for Hard difficulty: "))
+        if difficulty == 0 or difficulty > 1:
+            print("Bot difficulty is now Easy.")
+        else:
+            print("Bot difficulty is now Hard.")
+    return game_mode if game_mode in [0, 1] else 0, difficulty if game_mode == 0 else 0
+
+
 # Main game
 def start_game():
     instructions()
     current_player = 'X'
-    current_game_mode = game_mode()
+    current_game_mode, current_difficulty = game_mode()
     game_on = True
 
     while game_on:
         # ensuring that the player types
         try:
-            if current_game_mode == 0: # Human vs Bot
+            if current_game_mode == 0:  # Human vs Bot
                 # Player
                 if current_player == 'X':
                     p1_position = player_input()
@@ -144,7 +115,7 @@ def start_game():
                         current_player = 'O'
                 # Bot
                 else:
-                    bot_position = bot_move_position()
+                    bot_position = bot_move_position(current_difficulty)
                     if bot_position is not None:
                         add_position(bot_position, 'O')
                         game_on = check_win()
@@ -174,8 +145,9 @@ def start_game():
 
     # restart game
     if restart_game():
-        BOARD_POSITION = [" " for _ in range(9)]
+        board_configs.reset_board()
         start_game()
+
 
 # initializes the game
 if __name__ == "__main__":
