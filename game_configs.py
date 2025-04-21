@@ -1,6 +1,5 @@
 from random import shuffle
 
-
 def instructions():
     print("Starting game")
     input("Press enter to play")

@@ -1,8 +1,8 @@
 from random import choice
 from game_configs import BoardConfigs, instructions
 
+# config object
 board_configs = BoardConfigs()
-
 
 # restart game
 def restart_game():
