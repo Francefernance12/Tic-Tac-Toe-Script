@@ -34,7 +34,7 @@ class BoardConfigs:
 
     # Create the board
     def game_board(self):
-        print(f"{self.BOARD_POSITION[0]} | {self.BOARD_POSITION[1]} | {self.BOARD_POSITION[2]}")
+        print(f"\n{self.BOARD_POSITION[0]} | {self.BOARD_POSITION[1]} | {self.BOARD_POSITION[2]}")
         print("--+---+--")
         print(f"{self.BOARD_POSITION[3]} | {self.BOARD_POSITION[4]} | {self.BOARD_POSITION[5]}")
         print("--+---+--")

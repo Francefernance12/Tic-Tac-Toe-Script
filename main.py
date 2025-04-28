@@ -34,7 +34,7 @@ def check_win():
 def add_position(position, player):
     # check if the position is empty
     if board_configs.BOARD_POSITION[position] == ' ':
-        print(f"Player {player} chooses position {position}")
+        print(f"Player {player} chooses position {position}\n")
         board_configs.BOARD_POSITION[position] = player
         return True
 
@@ -73,9 +73,10 @@ def bot_move_position(difficulty):
     return choice(available_pos)
 
 
-def player_input():
+def player_input(current_player):
     while True:
         try:
+            print(f"\nCurrent Player: {current_player}")
             position = int(input("Enter a number from 0 to 8: "))
             if 0 <= position <= 8:
                 return position
@@ -109,7 +110,7 @@ def start_game():
             if current_game_mode == 0:  # Human vs Bot
                 # Player
                 if current_player == 'X':
-                    p1_position = player_input()
+                    p1_position = player_input(current_player)
                     if add_position(p1_position, 'X'):
                         game_on = check_win()
                         current_player = 'O'
@@ -127,13 +128,13 @@ def start_game():
             elif current_game_mode == 1:  # Human vs Human
                 # Player 1
                 if current_player == 'X':
-                    p1_position = player_input()
+                    p1_position = player_input(current_player)
                     if add_position(p1_position, 'X'):
                         game_on = check_win()
                         current_player = 'O'
                 # Player 2
                 else:
-                    p2_position = player_input()
+                    p2_position = player_input(current_player)
                     if add_position(p2_position, 'O'):
                         game_on = check_win()
                         current_player = 'X'
